@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传多张图片</title>
+    <style>
+        .add-pic{ width: 160px; height: 200px; text-align: center; }
+        .add-pic .pic{  width: 160px; height: 160px;  overflow: hidden; position: relative;}
+        .add-pic .inp-flie-btn,.add-pic .img{ width: 100%; height: 100%; position: absolute; left: 0; top: 0;}
+        .add-pic .inp-flie-btn{ opacity: 0; z-index: 1;}
+        .add-pic .ti{ line-height: 30px;}
+        .pic-list{ width: auto; padding: 20px;}
+        .pic-list img{ margin: 10px;}
+    </style>
+</head>
+<body>
+
+<div class="add-pic">
+    <div class="pic">
+        <img src="imgs/add-pic-btn.png" class="img"  id="add-pic-img" alt="">
+        <input type="file" accept="image/*" multiple  class="inp-flie-btn" id="add-pic-btn">
+    </div>
+    <p class="ti">上传多张图片</p>
+</div>
+
+<div class="pic-list">
+
+</div>
+
+
+<!--上传多张图片:单击按钮上传，图片渲染到pic-list-->
+<script>
+    let file_input=document.getElementById("add-pic-btn");
+    //    触发事件用的是change，因为files是数组，需要添加下标
+    file_input.addEventListener("change",function(){
+        let obj = this,
+             obj_name=obj.files[0].name,
+             img_length=obj.files.length;
+        for(let i=0; i<img_length; i++){
+            if(!(/image\/\w+/).test(obj.files[i].type))
+            {
+                alert("上传的图片格式错误，请上传图片");
+                return false;
+            }
+            let reader = new FileReader();
+            reader.error=function(e){
+                alert("读取异常")
+            }
+            reader.onload = function(e){
+                // 创建div_html是包括图片和图片名称的容器
+                let img_html='<img src="'+e.target.result+'"/>',
+                    div_html=document.createElement("div");
+                if(document.getElementsByClassName("pic-list")[0].children.length<5) {
+                    div_html.innerHTML=img_html;
+                    div_html.className="img-div";
+                    document.getElementsByClassName("pic-list")[0].appendChild(div_html);
+                }else{
+                    alert("最多上传5张图片")
+                }
+            };
+            reader.onloadstart=function(){
+                console.log("开始读取"+obj_name);  //这里有个bug，就是获取图片的名字都是以第一张命名
+            }
+            reader.onprogress=function(e){
+                if(e.lengthComputable){
+                    console.log("正在读取文件")
+                }
+            };
+            reader.readAsDataURL(obj.files[i]);
+        }
+    })
+</script>
+
+</body>
+</html>

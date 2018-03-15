@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传单张图片</title>
+    <style>
+        .add-pic{ width: 160px; height: 160px; text-align: center; }
+        .add-pic .pic{ width: 100%; height: 100%; overflow: hidden; position: relative;}
+        .add-pic .inp-flie-btn,.add-pic .img{ width: 100%; height: 100%; position: absolute; left: 0; top: 0;}
+        .add-pic .inp-flie-btn{ opacity: 0; z-index: 1;}
+        .add-pic .ti{ line-height: 30px;}
+    </style>
+</head>
+<body>
+
+<div class="add-pic">
+    <div class="pic">
+        <img src="imgs/add-pic-btn.png" class="img" id="add-pic-img" alt="">
+        <input type="file" accept="image/*"  class="inp-flie-btn" id="add-pic-btn">
+    </div>
+    <p class="ti">上传单张图片</p>
+</div>
+
+<!--上传单张图片:单击按钮上传，value传到img的src里面-->
+<script type="text/javascript">
+    //定义类方法：
+    class Picture{
+        constructor(img){
+            this.img = img;
+        }
+        uploadPic(t){
+            let fileObj = t,
+                windowURL = window.URL || window.webkitURL,
+                dataURL,
+                _img = document.getElementById(this.img);
+            if(fileObj && fileObj.files && fileObj.files[0]){
+                dataURL = windowURL.createObjectURL(fileObj.files[0]);
+                _img.setAttribute('src',dataURL);
+            }else{
+                dataURL = t.value;
+                let imgObj = document.getElementById(this.img);
+                imgObj.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                imgObj.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = dataURL;
+            }
+        }
+    }
+
+    //调用方法：
+    document.getElementById('add-pic-btn').addEventListener("change",function(){
+        let newPic = new Picture('add-pic-img');
+        newPic.uploadPic(this);
+    });
+
+</script>
+
+</body>
+</html>
