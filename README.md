@@ -4,3 +4,5 @@
 * 单张:upload-single-picture.html
 
 * 多张:upload-multiple-picture.html
+
+* 优化版：upload-multiple-file.html
