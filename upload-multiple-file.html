@@ -11,12 +11,14 @@
     .upload-pic .up-lab{ background-color: #44b549; cursor: pointer; }
     .upload-pic .up-file{ z-index: 1;}
     .group-coms-pic{ padding-top: 30px; overflow: hidden; }
-    .group-coms-pic .item{  width: 116px; height: 148px; border:1px solid #f0f0f0; position: relative; float: left; overflow: hidden; margin-right: 20px; margin-bottom: 20px; }
-    .group-coms-pic .pic-box{ width:118px; height:117px; border-bottom:1px solid #f0f0f0;  position: relative;}
+    .group-coms-pic .item{  width: 116px; height: 148px; border:1px solid #f0f0f0; position: relative; float: left;margin-right: 20px; margin-bottom: 20px; }
+    .group-coms-pic .pic-box{ width:118px; height:117px; border-bottom:1px solid #f0f0f0;  overflow: hidden;  position: relative;}
     .group-coms-pic .pic-box .img{ height:117px; position: absolute; left: 50%; top: 50%;
         transform:translate(-50%,-50%);}
     .group-coms-pic .tk{ padding:0 9px; height: 32px; line-height: 32px; text-align: left;
         overflow: hidden;  white-space: nowrap;  text-overflow: ellipsis; color: #353535;  font-size: 14px;}
+    .group-coms-pic .item .del{ width:20px; height: 20px; line-height: 20px; text-align: center; border-radius: 50%; color: #fff;
+        background-color: #ff6982; cursor: pointer; font-style: normal; position: absolute; right: -10px; top: -10px; }
 </style>
 </head>
 <body>
@@ -27,12 +29,15 @@
 </div>
 
 <div class="group-coms-pic" id="groupTu">
+    <!--
     <div class="item">
         <div class="pic-box">
             <img class="img" src="http://n4-q.mafengwo.net/s13/M00/9E/31/wKgEaVx6eymAKYK_AAU40faE3IY94.jpeg?imageMogr2%2Fthumbnail%2F%21300x166r%2Fgravity%2FCenter%2Fcrop%2F%21300x166%2Fquality%2F100">
         </div>
         <div class="tk">111.jpg</div>
+        <span class="del">x</span>
     </div>
+    -->
 </div>
 
 
@@ -58,7 +63,6 @@
                 console.log("读取异常")
             }
 
-
             //iffi语法
             ;(function(i){
                   //读取成功
@@ -75,16 +79,28 @@
                     img.setAttribute('class','img');
                     img.setAttribute('src',_src);
                     var divTk = document.createElement('div');
-                    divTk.setAttribute('class','tk');
+                    divTk.setAttribute('class','tk')
+                    var spanDel = document.createElement('span');
+                    spanDel.setAttribute('class','del');
+                    spanDel.setAttribute('title',arrTitle[i]);
+                    spanDel.innerText = 'x';
+
                     divTk.innerHTML = arrTitle[i];
 
                     divItem.appendChild(divPic);
                     divPic.appendChild(img);
                     divItem.appendChild(divTk);
+                    divItem.appendChild(spanDel);
 
-                    //增加节点
+                    //增加节点结构
                     var groupTu =  document.getElementById('groupTu');
                     groupTu.insertBefore(divItem, groupTu.firstChild);
+
+                    //增加删除节点
+                    spanDel.onclick = function(){
+                        removeItem(this);
+                        return false;
+                    };
 
                 };
             })(i)
@@ -101,6 +117,19 @@
         }
 
     })
+
+    //删除图片
+    function removeItem(delNode){
+        var itemNode = delNode.parentNode,
+            title = delNode.getAttribute('title');
+        var flag = confirm("确认要删除名为："+title+"的图片？");
+        if(flag) {
+            itemNode.parentNode.removeChild(itemNode);
+            console.log('删除成功~')
+        }
+        return false;
+    }
+
 </script>
 
 </body>
