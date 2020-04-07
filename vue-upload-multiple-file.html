@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>基于vue上传多张图片</title>
+    <style type="text/css" media="screen">
+        .upload-pic{ width: 120px;  height: 30px;  line-height: 30px; border-radius: 4px; color: #fff; position: relative; cursor: pointer;
+            font-size: 14px;  background-color: #44b549;  text-align: center;  display: inline-block;
+            vertical-align: middle; margin-left: 8px;  margin-top: 8px;  }
+        .upload-pic .up-lab,.upload-pic .up-file{ width: 100%; height: 100%; position: absolute; left: 0; top: 0; z-index: 2; overflow: hidden;}
+        .upload-pic .up-lab{ background-color: #44b549; cursor: pointer; }
+        .upload-pic .up-file{ z-index: 1;}
+        .group-coms-pic{ padding-top: 30px; overflow: hidden; }
+        .group-coms-pic .item{  width: 116px; height: 148px; border:1px solid #f0f0f0; position: relative; float: left;margin-right: 20px; margin-bottom: 20px; }
+        .group-coms-pic .pic-box{ width:118px; height:117px; border-bottom:1px solid #f0f0f0;  overflow: hidden;  position: relative;}
+        .group-coms-pic .pic-box .img{ height:117px; position: absolute; left: 50%; top: 50%;
+            transform:translate(-50%,-50%);}
+        .group-coms-pic .tk{ padding:0 9px; height: 32px; line-height: 32px; text-align: left;
+            overflow: hidden;  white-space: nowrap;  text-overflow: ellipsis; color: #353535;  font-size: 14px;}
+        .group-coms-pic .item .del{ width:20px; height: 20px; line-height: 20px; text-align: center; border-radius: 50%; color: #fff;
+            background-color: #ff6982; cursor: pointer; font-style: normal; position: absolute; right: -10px; top: -10px; }
+    </style>
+</head>
+<body>
+
+<section id="vue-imgUpload">
+    <div class="upload-pic">
+        <label class="up-lab" for="add-pic-btn">上传图片集</label>
+        <input type="file" accept="image/*" multiple class="up-file" id="add-pic-btn" @change="addImg()">
+    </div>
+    <div class="group-coms-pic" v-if="list.length>0" v-cloak>
+        <div class="item" v-for="(v,i) in list" :key="i" >
+            <div class="pic-box">
+                <img class="img" :src="v.src">
+            </div>
+            <div class="tk">{{v.name}}</div>
+            <span class="del" @click="delImg(i)">x</span>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script>
+    //vueImgUpload
+    const vueImgUpload = new Vue({
+        el: '#vue-imgUpload',
+        data(){
+            return{
+                list:[], //用于结构渲染
+                allArr:[],  //存储每次上传的所有flie，
+                limitNum:3, //限制数量
+            }
+        },
+        methods:{
+            //添加图片
+            addImg(){
+                let that = this;
+                var obj = that.getId('add-pic-btn'),
+                    obArr =  obj.files,
+                    length = obArr.length,
+                    arr = [],
+                    limitNum = that.limitNum;
+                for(let x of obArr){
+                    var params = {name: x.name, src:''};
+                    arr.push(params);
+                }
+                that.allArr = [...that.allArr,...arr];
+                //定义一个函数作回调
+                const Pro = function () {
+                    return new Promise(function (resolve, reject) {
+                        arr.forEach((v,i,array)=>{
+                            resolve(array)
+                        });
+                    })
+                };
+                Pro().then((newArr)=>{
+                    // console.log(newArr);
+                    for(let i=0; i<newArr.length; i++) {
+                        var reader = new FileReader();
+                        if (!reader) {
+                            console.log('对不起，您的浏览器不支持！请更换浏览器试一下');
+                            return
+                        }
+                        //读取成功
+                        reader.onload = function(e) {
+                            // console.log(e)
+                            var _src = e.target.result;
+                            newArr[i].src = _src;
+                            that.clearVal();
+                        };
+                        reader.onloadstart=function(){
+                            console.log('开始')
+                        };
+                        reader.onprogress=function(e){
+                            if(e.lengthComputable){
+                                console.log("正在读取文件")
+                            }
+                        };
+                        reader.error = function(){
+                            console.log("读取异常")
+                        };
+                        reader.readAsDataURL(obj.files[i]);
+                    }
+                    //合并数组,先合并在删除多余；
+                    var len1 = that.list.length,
+                        len2 = newArr.length;
+                    var d = [...that.list,...newArr];
+                    that.list = d;
+                    // console.log(len1,len2,d)
+                    if(d.length > limitNum){
+                        alert(`最多只能上传${limitNum}张图片`);
+                        that.list.splice(limitNum,d.length-limitNum);
+                        // console.log(that.list)
+                    }
+                });
+            },
+            //删除图片
+            delImg(i){
+                var flag = confirm(`确认要删除名为：${this.list[i].name}的图片？`);
+                if(flag) {
+                    this.list.splice(i,1);
+                    this.allArr.splice(i,1);
+                }
+                //这个得清空，不然全部被删除后，无法再次上传同一图片
+               if(this.list.length<=0){
+                   this.clearVal();
+               }
+            },
+            //每次上传完清除一下value
+            clearVal(){
+                this.getId('add-pic-btn').value = null;
+            },
+            //dom
+            getId(id){
+                return document.getElementById(id);
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
