@@ -6,3 +6,5 @@
 * 多张:upload-multiple-picture.html
 
 * 优化版：upload-multiple-file.html
+
+* vue版：vue-upload-multiple-file.html
